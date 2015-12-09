@@ -2,19 +2,14 @@
 # when = everyday at 02
 # for backupninja
 
-# list here the folders to backup
-foldersToBackup=("/var/www/" "/var/backups/postgres/")
-
 set -e
-red=$(tput setaf 1)
-green=$(tput setaf 2)
-normal=$(tput sgr0)
 startedAt=$(date +%s)
-
 
 # ------------------------------------
 #    parameters that you can change
 # ------------------------------------
+# list here the folders to backup
+foldersToBackup=("/var/www/" "/var/backups/postgres/")
 localBackupFolder="/var/backups/history"
 remoteBackupFolder="/mnt/nas/history"
 logFile="/var/log/backup.log"
@@ -29,7 +24,7 @@ emailLogs="always"
 # always will only send a short text on sucess or failure
 # error will only send if the script failed
 
-backupFolderName="backup-$(hostname -f)-$(date +%d-%m-%Y)"
+backupFolderName="backup-$(hostname -f)-$(date +%d-%m-%Y-%H:%M:%S)"
 backupFolderFullName="$localBackupFolder/$backupFolderName"
 # ------------------------------------
 #  End of parameters
@@ -39,12 +34,6 @@ backupFolderFullName="$localBackupFolder/$backupFolderName"
 # ------------------------------------
 # Script
 # ------------------------------------
-if [ ! -s $backupFolderFullName ] ; then
-        backupFolderFullName="$backupFolderFullName-$(shuf -i1-999 -n1)"
-        mkdir $backupFolderFullName
-else
-        mkdir $backupFolderFullName
-fi
 
 # Fichier log
 if [ -s $logFile ]; then rm $logFile; else touch $logFile; fi
@@ -99,7 +88,7 @@ fi
 
 case $emailLogs in
 "debug")
-        cat $debugLogFile | mail -s "Backup debug result from $(hostname -f)" $emailTo;;
+        cat $errorLogFile $debugLogFile | mail -s "Backup debug result from $(hostname -f)" $emailTo;;
 "always")
         cat $logFile | mail -s "Backup result from $(hostname -f)" $emailTo;;
 "error")
