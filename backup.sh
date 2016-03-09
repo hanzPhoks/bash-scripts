@@ -75,7 +75,7 @@ case $dbType in
             fi
             for db in $databases; do
                     if [ $backupEachDBTable = "yes" ]; then
-                            tables=$(mysql -u $dbRoot -p$dbPasswd -h $dbHost $db -e "show tables;" | tr -d "|")
+                            tables=$(mysql -u $dbRoot -p$dbPasswd -h $dbHost $db -e "show tables;" | tr -d "|" | grep -v "Tables")
                             for table in $tables; do 
                                     mysqldump --opt -u $dbRoot -p$dbPasswd -h $dbHost $db $table > /tmp/mysql/${db}/${table}.sql
                             done
